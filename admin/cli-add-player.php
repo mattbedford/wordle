@@ -1,0 +1,1 @@
+<?php echo 'CLI player add script placeholder'; ?>

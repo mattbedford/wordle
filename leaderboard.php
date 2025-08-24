@@ -1,0 +1,1 @@
+<?php echo 'Leaderboard page placeholder'; ?>

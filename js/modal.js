@@ -1,0 +1,1 @@
+console.log('Modal logic placeholder');
