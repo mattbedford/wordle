@@ -1,2 +1,5 @@
-Wordle leaderboard scaffold.
-Add more content as needed.
+# Wordle leaderboard scaffold.
+
+Call env vars with:
+`require_once __DIR__ . '/env.php';
+ env_load();`

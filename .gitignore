@@ -1,0 +1,26 @@
+# Sensitive config
+.env
+
+# SQLite database
+db/*.db
+db/*.sqlite
+db/*.sqlite3
+
+# Log files
+*.log
+/logs/
+/tmp/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node/npm stuff (if ever added for PWA build)
+node_modules/
+dist/
