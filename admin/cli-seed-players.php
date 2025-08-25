@@ -10,6 +10,7 @@ $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $players = [
     $_ENV['PLAYER_MATT'],
     $_ENV['PLAYER_SOPHIE'],
+    $_ENV['PLAYER_SARAH'],
     $_ENV['PLAYER_NICK'],
     $_ENV['PLAYER_NONNA'],
     $_ENV['PLAYER_LUKE'],
