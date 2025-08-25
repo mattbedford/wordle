@@ -1,1 +1,0 @@
-<?php echo 'Admin player management UI placeholder'; ?>
