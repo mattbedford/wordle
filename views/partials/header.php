@@ -1,10 +1,24 @@
+<?php
+require_once __DIR__ . './../env.php';
+env_load();
+?>
+
+
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title><?= $title ?? 'Wordle Leaderboard' ?></title>
+    <title><?php echo $title ?? 'Wordle Leaderboard'; ?></title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="favicon" href="/favicon.ico">
+
+    <!--manifest etc-->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#111">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+
     <script>
         (function() {
             const stored = localStorage.getItem('theme');
@@ -16,7 +30,7 @@
 </head>
 <body>
 <header>
-    <div class="site-title"><?= $_ENV['SITE_NAME'] ?? 'Family Wordle' ?></div>
+    <div class="site-title"><?php echo $_ENV['SITE_NAME'] ?? 'Family Wordle'; ?></div>
     <nav>
         <a href="/leaderboard">Today</a>
         <a href="/history">History</a>

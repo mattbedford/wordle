@@ -1,7 +1,5 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__ . '/env.php';
-env_load();
 
 $dbPath = $_ENV['DB_PATH'] ?? 'data/scores.db';
 $pdo = new PDO('sqlite:' . $dbPath);

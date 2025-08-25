@@ -14,11 +14,14 @@
 }
 
 
-body {
+body, html {
     margin: 0;
     background: var(--bg);
     color: var(--fg);
     font-family: system-ui, sans-serif;
+    width:100vw;
+    max-width:100dvw;
+    overflow-x:hidden;
 }
 
 header {
@@ -181,7 +184,17 @@ dialog button {
         margin: 0.5em 0.5em 0 0;
     }
 
+    table {
+        display: block;
+        width: auto;
+        overflow-x: scroll;
+    }
     table th, table td {
         font-size: 0.9em;
+    }
+    #rulesDialog {
+        max-width: 95%;
+        margin-left:15px;
+        margin-right:15px;
     }
 }
