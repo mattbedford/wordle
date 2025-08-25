@@ -31,9 +31,7 @@ $pdo->exec('CREATE TABLE IF NOT EXISTS scores (
 function parse_wordle_line(string $text): ?array {
     $lines = preg_split('/\r\n|\r|\n/', trim($text));
     foreach ($lines as $line) {
-        // remove thousands separators like 1,234
         $line = preg_replace('/(\d),(\d{3})/', '$1$2', $line);
-        // Match: Wordle 1527 3/6  or  X/6
         if (preg_match('/Wordle\s+(\d+)\s+([1-6Xx])\/6/', $line, $m)) {
             $puzzle  = (int)$m[1];
             $guesses = strtoupper($m[2]) === 'X' ? 7 : (int)$m[2];
@@ -45,14 +43,12 @@ function parse_wordle_line(string $text): ?array {
 
 // --- Minimal RFC822 split: headers + body (no external deps) ---
 function parse_headers_and_body(string $raw): array {
-    // split on first blank line
     if (preg_match("/\r?\n\r?\n/", $raw, $m, PREG_OFFSET_CAPTURE)) {
         $pos  = $m[0][1];
         $hdrs = substr($raw, 0, $pos);
         $body = substr($raw, $pos + strlen($m[0][0]));
-    } else {
-        $hdrs = $raw; $body = '';
-    }
+    } else { $hdrs = $raw; $body = ''; }
+
     // unfold header continuations
     $hdrs = preg_replace("/\r?\n[ \t]+/", ' ', $hdrs);
     $headers = [];
@@ -61,7 +57,8 @@ function parse_headers_and_body(string $raw): array {
         [$k, $v] = explode(':', $line, 2);
         $headers[strtolower(trim($k))] = trim($v);
     }
-    // subject decode
+
+    // Subject decode
     $subject = $headers['subject'] ?? '';
     if (function_exists('iconv_mime_decode')) {
         $dec = @iconv_mime_decode($subject, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8');
@@ -69,37 +66,26 @@ function parse_headers_and_body(string $raw): array {
     } elseif (function_exists('mb_decode_mimeheader')) {
         $subject = @mb_decode_mimeheader($subject);
     }
-    // extract plain email from From:
+
+    // From address (plain)
     $from = strtolower($headers['from'] ?? '');
-    if (preg_match('/<([^>]+)>/', $from, $m2)) {
-        $from = strtolower($m2[1]);
-    } else {
-        $from = strtolower(trim($from));
-    }
+    if (preg_match('/<([^>]+)>/', $from, $m2)) $from = strtolower($m2[1]); else $from = strtolower(trim($from));
     $date = $headers['date'] ?? gmdate('r');
 
-    // if body is empty and there’s HTML only, strip tags as fallback
+    // crude HTML fallback
     if ($body === '' && isset($headers['content-type']) && stripos($headers['content-type'], 'html') !== false) {
-        $body = trim(strip_tags($raw)); // crude but fine for Wordle lines
+        $body = trim(strip_tags($raw));
     }
-
     return [$from, $subject, $body, $date];
 }
 
 // --- Process Maildir/new ---
 $newDir = $maildir . '/new';
 $curDir = $maildir . '/cur';
-
-if (!is_dir($newDir)) {
-    fwrite(STDERR, "No Maildir at $newDir\n");
-    exit(1);
-}
+if (!is_dir($newDir)) { fwrite(STDERR, "No Maildir at $newDir\n"); exit(1); }
 
 $files = glob($newDir . '/*') ?: [];
-if (!$files) {
-    echo "📭 No new messages.\n";
-    exit(0);
-}
+if (!$files) { echo "📭 No new messages.\n"; exit(0); }
 
 foreach ($files as $path) {
     if (!is_file($path)) continue;
@@ -109,18 +95,15 @@ foreach ($files as $path) {
 
     echo "📧 From: $fromEmail\n";
 
-    // log raw for debugging
+    // log raw
     $stmt = $pdo->prepare('INSERT INTO scores_raw (sender, subject, body, sent_at, created_at)
                            VALUES (:s, :subj, :b, :sent, :now)');
     $stmt->execute([
-        ':s' => $fromEmail,
-        ':subj' => $subject,
-        ':b' => $body,
-        ':sent' => $sentAt,
-        ':now' => gmdate('c'),
+        ':s' => $fromEmail, ':subj' => $subject, ':b' => $body,
+        ':sent' => $sentAt, ':now' => gmdate('c'),
     ]);
 
-    // score from body or subject
+    // parse score
     $score = parse_wordle_line($body) ?? parse_wordle_line($subject);
     if (!$score) {
         echo "❌ No score found.\n---\n";
@@ -129,7 +112,7 @@ foreach ($files as $path) {
     }
     [$puzzle, $guesses] = $score;
 
-    // lookup player
+    // match player
     $stmt = $pdo->prepare('SELECT id, name FROM players WHERE email = ?');
     $stmt->execute([$fromEmail]);
     $player = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -140,7 +123,7 @@ foreach ($files as $path) {
         continue;
     }
 
-    // insert (idempotent via UNIQUE(player_id,puzzle))
+    // insert (idempotent)
     $stmt = $pdo->prepare('
         INSERT OR IGNORE INTO scores (player_id, puzzle, guesses, created_at)
         VALUES (?, ?, ?, datetime("now"))
