@@ -1,6 +1,6 @@
-FROM php:8.2-apache
+FROM php:8.2-cli
 
-# Install dependencies
+# Install system dependencies
 RUN apt-get update && \
     apt-get install -y \
         libicu-dev \
@@ -20,23 +20,33 @@ RUN apt-get update && \
         make \
         libpng-dev \
         libjpeg-dev \
-        libonig-dev
+        libonig-dev \
+        zlib1g-dev \
+        libzip-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Build and install IMAP extension
-RUN docker-php-source extract && \
-    pecl install imap && \
-    docker-php-ext-enable imap && \
-    docker-php-source delete
+# Install PHP extensions
+RUN docker-php-ext-install \
+        intl \
+        xml \
+        pdo \
+        pdo_sqlite \
+        sqlite3 \
+        mbstring \
+        zip \
+        gd \
+        opcache
 
-# Enable SQLite and other PHP extensions
-RUN docker-php-ext-install pdo pdo_sqlite sqlite3 mbstring intl
+# Install IMAP manually
+RUN pecl install imap && docker-php-ext-enable imap
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
+# Set working dir
+WORKDIR /app
 
-# Set working dir and copy app
-WORKDIR /var/www/html
+# Copy your project files
 COPY . .
 
-# Permissions
-RUN chown -R www-data:www-data /var/www/html
+# Expose port (if running built-in PHP server)
+EXPOSE 8080
+
+CMD ["php", "-S", "0.0.0.0:8080", "-t", "."]
