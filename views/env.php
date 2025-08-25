@@ -1,6 +1,6 @@
 <?php
 // env.php - basic .env loader (no dependencies)
-function env_load(string $path = __DIR__ . '/../.env'): void {
+function env_load(string $path = __DIR__ . '/../../.env'): void {
     if (!file_exists($path)) return;
     foreach (file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
         if (str_starts_with(trim($line), '#')) continue;
