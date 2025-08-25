@@ -12,48 +12,52 @@ $stmt = $pdo->prepare("SELECT puzzle FROM scores WHERE DATE(created_at) = DATE('
 $stmt->execute();
 $puzzle = $stmt->fetchColumn();
 
-if (!$puzzle) {
-    echo "<h1>No scores yet today</h1>";
-    exit;
-}
+$title = "Today's Leaderboard";
+require __DIR__ . '/partials/header.php';
+?>
 
+<h1>Leaderboard – Wordle</h1>
+
+<?php if (!$puzzle): ?>
+    <p>No scores yet today. Be the first to post yours!</p>
+<?php else: ?>
+
+    <?php
 // Fetch all scores for that puzzle
-$stmt = $pdo->prepare("
+    $stmt = $pdo->prepare("
     SELECT s.guesses, s.created_at, p.name
     FROM scores s
     JOIN players p ON s.player_id = p.id
     WHERE s.puzzle = ?
     ORDER BY s.guesses ASC, s.created_at ASC
 ");
-$stmt->execute([$puzzle]);
-$scores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->execute([$puzzle]);
+    $scores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    ?>
 
-$title = "Today's Leaderboard";
-require __DIR__ . '/partials/header.php';
-?>
-
-
-<h1>Leaderboard – Wordle</h1>
-<table>
-    <thead>
-    <tr>
-        <th>Rank</th>
-        <th>Player</th>
-        <th>Guesses</th>
-        <th>Submitted</th>
-    </tr>
-    </thead>
-    <tbody>
-    <?php $rank = 1; foreach ($scores as $row): ?>
+    <table>
+        <thead>
         <tr>
-            <td><?= $rank++ ?></td>
-            <td><?= htmlspecialchars($row['name']) ?></td>
-            <td><?= $row['guesses'] === 7 ? 'X/6' : $row['guesses'] . '/6' ?></td>
-            <td><?= date('H:i', strtotime($row['created_at'])) ?></td>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Guesses</th>
+            <th>Submitted</th>
         </tr>
-    <?php endforeach; ?>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        <?php $rank = 1; foreach ($scores as $row): ?>
+            <tr>
+                <td><?= $rank++ ?></td>
+                <td><?= htmlspecialchars($row['name']) ?></td>
+                <td><?= $row['guesses'] === 7 ? 'X/6' : $row['guesses'] . '/6' ?></td>
+                <td><?= date('H:i', strtotime($row['created_at'])) ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+
+<?php endif; ?>
+
 
 <?php
 // Rolling leaderboard (last 30 days)
@@ -88,7 +92,6 @@ foreach ($players as $player) {
     ];
 }
 
-// Sort by rolling score DESC
 usort($rolling, fn($a, $b) => $b['score'] <=> $a['score']);
 ?>
 
@@ -117,7 +120,5 @@ usort($rolling, fn($a, $b) => $b['score'] <=> $a['score']);
     <?php endforeach; ?>
     </tbody>
 </table>
-
-
 
 <?php require __DIR__ . '/partials/footer.php'; ?>

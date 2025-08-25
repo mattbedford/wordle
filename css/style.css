@@ -85,6 +85,30 @@ a {
     color: var(--accent);
 }
 
+/*History page*/
+.grid {
+    display: grid;
+    gap: 1.5em;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    margin-top: 2em;
+}
+
+.card {
+    background: var(--card);
+    padding: 1em;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+}
+
+.card-header {
+    margin-bottom: 0.8em;
+    font-size: 0.95em;
+    line-height: 1.4;
+    border-bottom: 1px solid #333;
+    padding-bottom: 0.5em;
+}
+
+
 /*Modal*/
 dialog {
     background: var(--card);

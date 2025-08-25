@@ -7,26 +7,60 @@ $dbPath = $_ENV['DB_PATH'] ?? 'data/scores.db';
 $pdo = new PDO('sqlite:' . $dbPath);
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// Fetch last 30 unique puzzles with scores
+// Get last 30 puzzles with scores
 $stmt = $pdo->query("
     SELECT DISTINCT puzzle
     FROM scores
     ORDER BY puzzle DESC
     LIMIT 30
 ");
-$puzzles = $stmt->fetchAll(PDO::FETCH_COLUMN);
+$puzzleIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-$title = "Today's Leaderboard";
+$title = "History";
 require __DIR__ . '/partials/header.php';
 ?>
 
+<h1>Past Games</h1>
 
-<h1>Past Wordle Puzzles</h1>
-<ul>
-    <?php foreach ($puzzles as $puzzle): ?>
-        <li><a href="/leaderboard?puzzle=<?= (int)$puzzle ?>">Puzzle <?= (int)$puzzle ?></a></li>
+<div class="grid">
+    <?php foreach ($puzzleIds as $puzzle):
+        // Get scores for this puzzle
+        $stmt = $pdo->prepare("
+        SELECT s.guesses, s.created_at, p.name
+        FROM scores s
+        JOIN players p ON s.player_id = p.id
+        WHERE s.puzzle = ?
+        ORDER BY s.guesses ASC, s.created_at ASC
+    ");
+        $stmt->execute([$puzzle]);
+        $scores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!$scores) continue;
+
+        $date = (new DateTime($scores[0]['created_at']))->format('j M Y');
+        $winner = $scores[0]['name'];
+        ?>
+        <div class="card">
+            <div class="card-header">
+                <strong>Wordle <?= (int)$puzzle ?></strong><br>
+                <small><?= $date ?></small><br>
+                <em>🏆 <?= htmlspecialchars($winner) ?></em>
+            </div>
+            <table>
+                <thead>
+                <tr><th>Player</th><th>Guesses</th></tr>
+                </thead>
+                <tbody>
+                <?php foreach ($scores as $s): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($s['name']) ?></td>
+                        <td><?= $s['guesses'] === 'X' ? 'X' : (int)$s['guesses'] ?>/6</td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     <?php endforeach; ?>
-</ul>
-
+</div>
 
 <?php require __DIR__ . '/partials/footer.php'; ?>
