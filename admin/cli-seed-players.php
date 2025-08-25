@@ -7,15 +7,7 @@ $pdo = new PDO('sqlite:' . $_ENV['DB_PATH']);
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // Add or update players
-$players = [
-    $_ENV['PLAYER_MATT'],
-    $_ENV['PLAYER_SOPHIE'],
-    $_ENV['PLAYER_SARAH'],
-    $_ENV['PLAYER_NICK'],
-    $_ENV['PLAYER_NONNA'],
-    $_ENV['PLAYER_LUKE'],
-    $_ENV['PLAYER_POPPA'],
-];
+$players = json_decode(file_get_contents(__DIR__ . '/../../players.json'), true);
 
 foreach ($players as [$name, $email]) {
     $stmt = $pdo->prepare("INSERT OR IGNORE INTO players (name, email) VALUES (?, ?)");
