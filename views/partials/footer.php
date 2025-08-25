@@ -1,6 +1,6 @@
 </main>
 <footer>
-    <p>&copy; <?= date('Y') ?> Wordle Tracker · Made with ❤️ for friends & family</p>
+    <p>&copy; <?= date('Y') ?> Wordle Tracker · Made with ❤️ for friends & family by Matt</p>
 </footer>
 
 <dialog id="rulesDialog">

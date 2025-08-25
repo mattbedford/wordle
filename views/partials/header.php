@@ -20,8 +20,12 @@
     <nav>
         <a href="/leaderboard">Today</a>
         <a href="/history">History</a>
-        <a href="#" onclick="document.getElementById('rulesDialog').showModal(); return false;">❓ Rules</a>
-        <button id="themeToggle" style="margin-left:1em;">🌓</button>
+        <a href="#" onclick="document.getElementById('rulesDialog').showModal(); return false;">
+            <svg xmlns="http://www.w3.org/2000/svg" class="help-rules" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+        </a>
+        <button id="themeToggle" style="margin-left:1em;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-moon-star-icon lucide-moon-star" viewBox="0 0 24 24"><path d="M18 5h4M20 3v4M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+        </button>
     </nav>
 </header>
 <main>

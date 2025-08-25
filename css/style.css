@@ -51,6 +51,28 @@ nav a:hover {
     color: var(--accent);
 }
 
+[data-theme="light"] nav a,
+[data-theme="light"] .site-title {
+    color: var(--bg);
+}
+
+#themeToggle {
+    background:none;
+    fill:white;
+    border:none;
+    cursor:pointer;
+    padding:0;
+    margin:0;
+    width:20px;
+    height:20px;
+}
+#themeToggle svg, .help-rules {
+    stroke:white;
+    margin-bottom:-4px;
+    width:20px;
+    height:20px;
+}
+
 main {
     max-width: 800px;
     margin: 2em auto;
